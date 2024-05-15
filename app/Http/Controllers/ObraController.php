@@ -98,25 +98,17 @@ class ObraController extends Controller
         }
 
 
-        public function destroy(Request $request, $id){
-   
+        public function destroy($id){
             if (isset($id)) {
+                var_dump($id);
                 $obra = Obra::find($id);
+                var_dump($obra);
                 if (!$obra) {
                     $response = array(
                         'status' => 404,
                         'message' => 'Obra no encontrada'
                     );
                     return response()->json($response, $response['status']);
-                }
-        
-                $imagenes = $obra->imagenes;
-        
-                if ($imagenes) {
-                    foreach ($imagenes as $imagen) {
-                        $filename = $imagen->imagen;
-                        \Storage::disk('obras')->delete($filename);
-                    }
                 }
                 
                 $delete = Obra::where('id', $id)->delete();
