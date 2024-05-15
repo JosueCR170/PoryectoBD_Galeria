@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Obra extends Model
 {
     use HasFactory;
+
+    protected $table = "obra";
     protected static $tecnicasArte = [
         'Óleo sobre lienzo',
         'Acuarela',
@@ -31,4 +33,8 @@ class Obra extends Model
     }
 
     public static function getTecnica(){return self::$tecnicasArte;}
+    
+    public function artista(){
+        return $this->belongsTo(Artista::class, 'idArtista');
+    }
 }
