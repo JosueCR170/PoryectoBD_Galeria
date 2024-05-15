@@ -20,7 +20,7 @@ class ObraController extends Controller
         );
         return response()->json($response,200);
     }
-      /**
+    /**
      * Metodo POST para crear un registro
      */
     public function store(Request $request){
@@ -31,10 +31,9 @@ class ObraController extends Controller
 
             $tecnica = Obra::getTecnica();
 
-
             $rules = [
                 'idArtista' => 'required|string|max:40',
-                'tecnica' => 'required|string|max:40',
+                'tecnica' => ['required', Rule::in($tecnica)],
                 'nombre' => 'required|string',
                 'tamaño' => 'required|max:20',
                 'precio' => 'required|decimal:0,4',
@@ -47,21 +46,19 @@ class ObraController extends Controller
             if(!$isValid->fails()){
                 $obra = new Obra();
                 $obra->idArtista=$data['idArtista'];
-                $obra->descripcion=$data['descripcion'];
-                $obra->duracion=$data['duracion'];
-                $obra->idioma=$data['idioma'];
-                $obra->subtitulo=$data['subtitulo'];
-                $obra->genero=$data['genero'];
-                $obra->fechaEstreno=$data['fechaEstreno'];
-                $obra->calificacionEdad=$data['calificacionEdad'];
-                $obra->animacion=$data['animacion'];
-                $obra->director=$data['director'];
-                $obra->elenco=$data['elenco'];
+                $obra->tecnica=$data['tecnica'];
+                $obra->nombre=$data['nombre'];
+                $obra->tamaño=$data['tamaño'];
+                $obra->precio=$data['precio'];
+                $obra->disponibilidad=$data['disponibilidad'];
+                $obra->categoria=$data['categoria'];
+                $obra->imagen=$data['imagen'];
+ 
                 $obra->save();
                 $response = array(
                     'status'=>201,
-                    'menssage'=>'pelicula creada',
-                    'pelicula'=>$obra
+                    'menssage'=>'Obra creada',
+                    'Obra'=>$obra
                 );
             }else{
                 $response = array(
@@ -86,8 +83,8 @@ class ObraController extends Controller
                 $data=$data->load('imagenes');
                 $response=array(
                 'status'=>200,
-                'menssage'=>'pelicula encontrada',
-                'category'=>$data
+                'menssage'=>'Obra encontrada',
+                'Obra'=>$data
                 );
             }
             else{
@@ -101,37 +98,29 @@ class ObraController extends Controller
         }
 
 
-        public function destroy(Request $request, $id){
-   
+        public function destroy($id){
             if (isset($id)) {
-                $pelicula = Pelicula::find($id);
-                if (!$pelicula) {
+                var_dump($id);
+                $obra = Obra::find($id);
+                var_dump($obra);
+                if (!$obra) {
                     $response = array(
                         'status' => 404,
-                        'message' => 'Pelicula no encontrada'
+                        'message' => 'Obra no encontrada'
                     );
                     return response()->json($response, $response['status']);
                 }
-        
-                $imagenes = $pelicula->imagenes;
-        
-                if ($imagenes) {
-                    foreach ($imagenes as $imagen) {
-                        $filename = $imagen->imagen;
-                        \Storage::disk('peliculas')->delete($filename);
-                    }
-                }
                 
-                $delete = Pelicula::where('id', $id)->delete();
+                $delete = Obra::where('id', $id)->delete();
                 if ($delete) {
                     $response = array(
                         'status' => 200,
-                        'message' => 'Pelicula eliminada',
+                        'message' => 'Obra eliminada',
                     );
                 } else {
                     $response = array(
                         'status' => 400,
-                        'message' => 'No se pudo eliminar la película, compruebe que exista'
+                        'message' => 'No se pudo eliminar la obra, compruebe que exista'
                     );
                 }
             } else {
@@ -147,22 +136,12 @@ class ObraController extends Controller
 
         //patch
     public function update(Request $request, $id) {
-        $jwt=new JwtAuth();
-        if(!$jwt->checkToken($request->header('bearertoken'),true)->permisoAdmin){
-         $response = array(
-             'status'=>406,
-             'menssage'=>'No tienes permiso de administrador'
-            
-         );
-        
-        }
-        else{
-
-        $pelicula = Pelicula::find($id);
-        if (!$pelicula) {
+    
+        $obra = Obra::find($id);
+        if (!$obra) {
             $response = [
                 'status' => 404,
-                'message' => 'Pelicula no encontrada'
+                'message' => 'Obra no encontrada'
             ];
             return response()->json($response, $response['status']);
         }
@@ -178,24 +157,19 @@ class ObraController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        $idiomas = Pelicula::getIdiomas();
-        $subtitulos = Pelicula::getSubtitulos();
-        $clasificacion = Pelicula::getClasificacion();
-        $animacion = Pelicula::getAnimacion();
+        $tecnica = Obra::getTecnica();
 
         $rules = [
-            'nombre' => 'string|max:40',
-            'duracion' => 'date_format:H:i:s',
-            'idioma' =>  Rule::in($idiomas),
-            'subtitulo' => Rule::in($subtitulos),
-            'genero' => 'max:20',
-            'fechaEstreno' => 'date',
-            'calificacionEdad' => Rule::in(array_keys($clasificacion)),
-            'animacion' => Rule::in($animacion),
-            'director' => 'max:70',
-            'elenco' => 'max:160',
+            'idArtista' => 'string|max:40',
+            'tecnica' => Rule::in($tecnica),
+            'nombre' => 'string',
+            'tamaño' => 'max:20',
+            'precio' => 'decimal:0,4',
+            'disponibilidad' => 'max:20',
+            'categoria' => 'max:45',
+            'imagen' => 'max:45',
         ];
-    
+
         $validator = \validator($data_input, $rules);
     
         if ($validator->fails()) {
@@ -207,26 +181,21 @@ class ObraController extends Controller
             return response()->json($response, $response['status']);
         }
     
-        if(isset($data_input['nombre'])) { $pelicula->nombre = $data_input['nombre']; }
-        if(isset($data_input['descripcion'])) { $pelicula->descripcion = $data_input['descripcion']; }
-        if(isset($data_input['idioma'])) { $pelicula->idioma = $data_input['idioma']; }
-        if(isset($data_input['subtitulo'])) { $pelicula->subtitulo = $data_input['subtitulo']; }
-        if(isset($data_input['genero'])) { $pelicula->genero = $data_input['genero']; }
-        if(isset($data_input['fechaEstreno'])) { $pelicula->fechaEstreno = $data_input['fechaEstreno']; }
-        if(isset($data_input['calificacionEdad'])) { $pelicula->calificacionEdad = $data_input['calificacionEdad']; }
-        if(isset($data_input['animacion'])) { $pelicula->animacion = $data_input['animacion']; }
-        if(isset($data_input['director'])) { $pelicula->director = $data_input['director']; }
-        if(isset($data_input['elenco'])) { $pelicula->elenco = $data_input['elenco']; }
+        if(isset($data_input['tecnica'])) { $obra->tecnica = $data_input['tecnica']; }
+        if(isset($data_input['nombre'])) { $obra->nombre = $data_input['nombre']; }
+        if(isset($data_input['tamaño'])) { $obra->tamaño = $data_input['tamaño']; }
+        if(isset($data_input['precio'])) { $obra->precio = $data_input['precio']; }
+        if(isset($data_input['disponibilidad'])) { $obra->disponibilidad = $data_input['disponibilidad']; }
+        if(isset($data_input['categoria'])) { $obra->categoria = $data_input['categoria']; }
+        if(isset($data_input['imagen'])) { $obra->imagen = $data_input['imagen']; }
 
-        $pelicula->save();
+        $obra->save();
     
         $response = [
             'status' => 201,
-            'message' => 'Pelicula actualizada',
-            'Pelicula' => $pelicula
+            'message' => 'Obra actualizada',
+            'Obra' => $obra
         ];
-    
-    }
         return response()->json($response, $response['status']);
     }
 }
