@@ -6,6 +6,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(
     function(){
-        Route::resource('/obra',ObraController::class,['except'=>['create','edit']]);
+        // Route::resource('/obra',ObraController::class,['except'=>['create','edit']]);
     }
 );

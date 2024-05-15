@@ -12,13 +12,13 @@ class ObraController extends Controller
 
     public function index()
     {
-        $data=Obra::all();
+        $obras=Obra::all();
         $response=array(
             "status"=>200,
-            "menssage"=>"Todos los registros de las peliculas",
-            "data"=>$data
+            "menssage"=>"Todos los registros de las obras",
+            "data"=>$obras
         );
-        return response()->json($response,200);
+        return view('obras.index', ['obras' => $obras]);
     }
     /**
      * Metodo POST para crear un registro
@@ -74,17 +74,17 @@ class ObraController extends Controller
             );
         }
    
-        return response()->json($response,$response['status']);
+        return redirect()->route('obras')->with('success', 'Todo created successfully');
     }
  
         public function show($id){
-            $data=Obra::find($id);
-            if(is_object($data)){
-                $data=$data->load('imagenes');
+            $obra=Obra::find($id);
+            if(is_object($obra)){
+                $obra=$obra->load('imagenes');
                 $response=array(
                 'status'=>200,
                 'menssage'=>'Obra encontrada',
-                'Obra'=>$data
+                'Obra'=>$obra
                 );
             }
             else{
@@ -94,7 +94,7 @@ class ObraController extends Controller
                 );
 
             }
-            return response()->json($response,$response['status']);
+            return view('obras.show', ['obra' => $obra]);
         }
 
 
@@ -130,7 +130,7 @@ class ObraController extends Controller
                 );
             }
         
-            return response()->json($response, $response['status']);
+            return redirect()->route('obras')->with('success', 'Todo deleted successfully');
         }
         
 
@@ -196,6 +196,6 @@ class ObraController extends Controller
             'message' => 'Obra actualizada',
             'Obra' => $obra
         ];
-        return response()->json($response, $response['status']);
+        return redirect()->route('obra')->with('success', 'Todo updated successfully');
     }
 }
