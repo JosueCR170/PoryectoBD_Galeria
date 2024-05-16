@@ -15,4 +15,4 @@ Route::delete('/obras/{id}', [ObraController::class , 'destroy'])->name('obras-d
 
 Route::get('/obras/{id}', [ObraController::class , 'show'])->name('obras-edit');
 
-Route::patch('/obras/{id}', [ObraController::class , 'update'])->name('obras-update');
+Route::put('/obras/{id}', [ObraController::class , 'update'])->name('obras-update');

@@ -41,19 +41,6 @@ class ObraController extends Controller
     public function show($id)
     {
         $obra = Obra::find($id);
-        if (is_object($obra)) {
-            $response = array(
-                'status' => 200,
-                'menssage' => 'Obra encontrada',
-                'Obra' => $obra
-            );
-        } else {
-            $response = array(
-                'status' => 404,
-                'menssage' => 'Recurso no encontrado'
-            );
-
-        }
         return view('obras.show', ['obra' => $obra]);
     }
 
@@ -61,117 +48,46 @@ class ObraController extends Controller
     public function destroy($id)
     {
         if (isset($id)) {
-            var_dump($id);
-            $obra = Obra::find($id);
-            var_dump($obra);
-            if (!$obra) {
-                $response = array(
-                    'status' => 404,
-                    'message' => 'Obra no encontrada'
-                );
-                return response()->json($response, $response['status']);
-            }
 
             $delete = Obra::where('id', $id)->delete();
             if ($delete) {
-                $response = array(
-                    'status' => 200,
-                    'message' => 'Obra eliminada',
-                );
+                return redirect()->route('obras')->with('success', 'Obra eliminada correctamente');
             } else {
-                $response = array(
-                    'status' => 400,
-                    'message' => 'No se pudo eliminar la obra, compruebe que exista'
-                );
+            return redirect()->route('obras')->with('Error', 'Obra no eliminada');
             }
-        } else {
-            $response = array(
-                'status' => 406,
-                'message' => 'Falta el identificador del recurso a eliminar'
-            );
         }
-
-        return redirect()->route('obras')->with('success', 'Todo deleted successfully');
+        return redirect()->route('obras')->with('Error', 'Obra no encontrada');
     }
 
 
     //patch
     public function update(Request $request, $id)
     {
-
-        $obra = Obra::find($id);
-        if (!$obra) {
-            $response = [
-                'status' => 404,
-                'message' => 'Obra no encontrada'
-            ];
-            return response()->json($response, $response['status']);
+        if (isset($id)) {
+            $obra = Obra::find($id);
+            if (isset($request->tecnica)) {
+                $obra->tecnica = $request->tecnica;
+            }
+            if (isset($request->nombre)) {
+                $obra->nombre = $request->nombre;
+            }
+            if (isset($request->tamaño)) {
+                $obra->tamaño = $request->tamaño;
+            }
+            if (isset($request->precio)) {
+                $obra->precio = $request->precio;
+            }
+            if (isset($request->disponibilidad)) {
+                $obra->disponibilidad = $request->disponibilidad;
+            }
+            if (isset($request->categoria)) {
+                $obra->categoria = $request->categoria;
+            }
+            if (isset($request->imagen)) {
+                $obra->imagen = $request->imagen;
+            }
+            $obra->save();
+            return redirect()->route('obras')->with('success', 'Todo updated successfully');
         }
-
-        $data_input = $request->input('data', null);
-        $data_input = json_decode($data_input, true);
-
-        if (!$data_input) {
-            $response = [
-                'status' => 400,
-                'message' => 'No se encontró el objeto data. No hay datos que modificar'
-            ];
-            return response()->json($response, $response['status']);
-        }
-
-        $tecnica = Obra::getTecnica();
-
-        $rules = [
-            'idArtista' => 'string|max:40',
-            'tecnica' => Rule::in($tecnica),
-            'nombre' => 'string',
-            'tamaño' => 'max:20',
-            'precio' => 'decimal:0,4',
-            'disponibilidad' => 'max:20',
-            'categoria' => 'max:45',
-            'imagen' => 'max:45',
-        ];
-
-        $validator = \validator($data_input, $rules);
-
-        if ($validator->fails()) {
-            $response = [
-                'status' => 406,
-                'message' => 'Datos inválidos',
-                'error' => $validator->errors()
-            ];
-            return response()->json($response, $response['status']);
-        }
-
-        if (isset($data_input['tecnica'])) {
-            $obra->tecnica = $data_input['tecnica'];
-        }
-        if (isset($data_input['nombre'])) {
-            $obra->nombre = $data_input['nombre'];
-        }
-        if (isset($data_input['tamaño'])) {
-            $obra->tamaño = $data_input['tamaño'];
-        }
-        if (isset($data_input['precio'])) {
-            $obra->precio = $data_input['precio'];
-        }
-        if (isset($data_input['disponibilidad'])) {
-            $obra->disponibilidad = $data_input['disponibilidad'];
-        }
-        if (isset($data_input['categoria'])) {
-            $obra->categoria = $data_input['categoria'];
-        }
-        if (isset($data_input['imagen'])) {
-            $obra->imagen = $data_input['imagen'];
-        }
-
-        $obra->save();
-
-        $response = [
-            'status' => 201,
-            'message' => 'Obra actualizada',
-            'Obra' => $obra
-        ];
-        return redirect()->route('obra')->with('success', 'Todo updated successfully');
     }
 }
