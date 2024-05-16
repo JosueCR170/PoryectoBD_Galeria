@@ -29,9 +29,6 @@ class Obra extends Model
         'Pirograbado',
         'Escultura en bronce'
     ];
-    public function imagenes(){
-        return $this->hasMany(Imagen::class, 'idPelicula');
-    }
 
     public static function getTecnica(){return self::$tecnicasArte;}
     
