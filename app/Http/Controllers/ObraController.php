@@ -32,8 +32,12 @@ class ObraController extends Controller
         $obra->precio = $request->precio;
         $obra->disponibilidad = 'disponible';
         $obra->categoria = $request->categoria;
-        $obra->imagen = null;
-        echo ($obra);
+        if ($request->hasFile('imagen')) {
+            $imagen = $request->file('imagen');
+            $imagen_blob = file_get_contents($imagen->getRealPath());
+            $obra->imagen = $imagen_blob;
+        }
+      
         $obra->save();
         return redirect()->route('obras')->with('success', 'Todo created successfully');
     }
@@ -43,8 +47,32 @@ class ObraController extends Controller
         $obra = Obra::find($id);
         return view('obras.show', ['obra' => $obra]);
     }
-
-
+    public function mostrarImagen($id)
+    {
+        $obra = Obra::find($id);
+        if ($obra && $obra->imagen) {
+            $extension = pathinfo($obra->imagen, PATHINFO_EXTENSION);
+    
+            $tipoContenido = '';
+            switch ($extension) {
+                case 'jpg':
+                case 'jpeg':
+                    $tipoContenido = 'image/jpeg';
+                    break;
+                case 'png':
+                    $tipoContenido = 'image/png';
+                    break;
+                case 'gif':
+                    $tipoContenido = 'image/gif';
+                    break;
+                default:
+             
+                    $tipoContenido = 'image/jpeg';
+            }
+            return response($obra->imagen)->header('Content-Type', $tipoContenido);
+        }
+        return abort(404);
+    }
     public function destroy($id)
     {
         if (isset($id)) {
@@ -83,8 +111,10 @@ class ObraController extends Controller
             if (isset($request->categoria)) {
                 $obra->categoria = $request->categoria;
             }
-            if (isset($request->imagen)) {
-                $obra->imagen = $request->imagen;
+            if ($request->hasFile('imagen')) {
+                $imagen = $request->file('imagen');
+                $imagen_blob = file_get_contents($imagen->getRealPath());
+                $obra->imagen = $imagen_blob;
             }
             $obra->save();
             return redirect()->route('obras')->with('success', 'Todo updated successfully');

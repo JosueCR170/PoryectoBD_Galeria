@@ -2,10 +2,10 @@
 
 @section('content')
 <link rel="stylesheet" href="{{asset('css/app.css')}}">
-
-<div class="container w-25 border">
+<h1 style="text-align: center; margin-top:20px; color:rgb(247, 247, 247)">Módulo de Obras</h1>
+<div class="container w-25">
     <div class="row mx-auto">
-    <form class="form" method="POST" action="{{route('obras')}}">
+    <form class="form" method="POST" action="{{route('obras')}}" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3 col" style="display: flex; flex-direction: column;">
@@ -76,26 +76,37 @@
         
         </div>
     </form>
-
-    <div >
-        @foreach ($obras as $obra)
-        
-            <div class="row py-1">
-                <div class="col-md-9 d-flex align-items-center">
-                    <a href="{{ route('obras-edit', ['id' => $obra->id]) }}">{{ $obra->nombre }}</a>
-                </div>
-
-                <div class="col-md-3 d-flex justify-content-end">
-                    <form action="{{ route('obras-destroy', [$obra->id]) }}" method="POST">
-                        @method('DELETE')
-                        @csrf
-                        <button class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </div>
-            </div>
-            
-        @endforeach
-    </div>
     </div>
 </div>
+<div style="display: grid;
+grid-template-columns: 1fr 1fr 1fr 1fr; justify-items: center;">
+    @foreach ($obras as $obra)
+      <div class="card" style="width: 18rem;">
+        <img src="{{ route('obras-imagen', $obra->id) }}"class="card-img-top" alt="Imagen de la obra">
+       <div class="card-body">
+      <h5 class="card-title">{{ $obra->nombre }}</h5>
+      <div style="display: flex; flex-direction: column;" >
+        <span style="margin-bottom: 6px;"><strong>Artista: </strong> {{ $obra->idArtista }}</span>
+      <span style="margin-bottom: 6px;"><strong>Tamaño: </strong> {{ $obra->tamaño }}</span>
+      <span style="margin-bottom: 6px;"><strong>Precio: </strong>${{ $obra->precio }}</span>
+      </div>
+      
+      <div class="row py-1">
+        <div class="col-md-9 d-flex align-items-center">
+            <a href="{{ route('obras-edit', ['id' => $obra->id]) }}" class="btn btn-primary">Editar</a>
+        </div>
+        <div class="col-md-3 d-flex justify-content-end">
+            <form action="{{ route('obras-destroy', [$obra->id]) }}" method="POST">
+                @method('DELETE')
+                @csrf
+                <button class="btn btn-danger btn-sm">Eliminar</button>
+            </form>
+        </div>
+    </div>
+      
+      </div>
+     </div>
+  @endforeach
+</div>
+
 @endsection

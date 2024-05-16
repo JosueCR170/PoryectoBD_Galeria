@@ -16,3 +16,5 @@ Route::delete('/obras/{id}', [ObraController::class , 'destroy'])->name('obras-d
 Route::get('/obras/{id}', [ObraController::class , 'show'])->name('obras-edit');
 
 Route::put('/obras/{id}', [ObraController::class , 'update'])->name('obras-update');
+
+Route::get('/obras/{id}/imagen', [ObraController::class, 'mostrarImagen'])->name('obras-imagen');
