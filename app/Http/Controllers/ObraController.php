@@ -8,135 +8,97 @@ use Illuminate\Validation\Rule;
 
 class ObraController extends Controller
 {
-   
 
     public function index()
     {
-        $obras=Obra::all();
-        $response=array(
-            "status"=>200,
-            "menssage"=>"Todos los registros de las obras",
-            "data"=>$obras
+        $obras = Obra::all();
+        $response = array(
+            "status" => 200,
+            "menssage" => "Todos los registros de las obras",
+            "data" => $obras
         );
         return view('obras.index', ['obras' => $obras]);
     }
     /**
      * Metodo POST para crear un registro
      */
-    public function store(Request $request){
-        $data_input = $request->input('data',null);
-        if($data_input){
-            $data = json_decode($data_input,true);
-            $data=array_map('trim',$data);
-
-            $tecnica = Obra::getTecnica();
-
-            $rules = [
-                'idArtista' => 'required|string|max:40',
-                'tecnica' => ['required', Rule::in($tecnica)],
-                'nombre' => 'required|string',
-                'tamaño' => 'required|max:20',
-                'precio' => 'required|decimal:0,4',
-                'disponibilidad' => 'required|max:20',
-                'categoria' => 'required|max:45',
-                'imagen' => 'required|max:45',
-            ];
-            
-            $isValid =\validator($data,$rules);
-            if(!$isValid->fails()){
-                $obra = new Obra();
-                $obra->idArtista=$data['idArtista'];
-                $obra->tecnica=$data['tecnica'];
-                $obra->nombre=$data['nombre'];
-                $obra->tamaño=$data['tamaño'];
-                $obra->precio=$data['precio'];
-                $obra->disponibilidad=$data['disponibilidad'];
-                $obra->categoria=$data['categoria'];
-                $obra->imagen=$data['imagen'];
- 
-                $obra->save();
-                $response = array(
-                    'status'=>201,
-                    'menssage'=>'Obra creada',
-                    'Obra'=>$obra
-                );
-            }else{
-                $response = array(
-                    'status'=>406,
-                    'menssage'=>'Datos invalidos',
-                    'errors'=>$isValid->errors()
-                );
-            }
-        }else{
-            $response = array(
-                'status'=>400,
-                'menssage'=>'No se encontro el objeto data'
-            );
-        }
-   
+    public function store(Request $request)
+    {
+        $obra = new Obra();
+        $obra->idArtista = $request->idArtista;
+        $obra->tecnica = $request->tecnica;
+        $obra->nombre = $request->nombre;
+        $obra->tamaño = $request->tamaño;
+        $obra->precio = $request->precio;
+        $obra->disponibilidad = 'disponible';
+        $obra->categoria = $request->categoria;
+        $obra->imagen = null;
+        echo ($obra);
+        $obra->save();
         return redirect()->route('obras')->with('success', 'Todo created successfully');
     }
- 
-        public function show($id){
-            $obra=Obra::find($id);
-            if(is_object($obra)){
-                $obra=$obra->load('imagenes');
-                $response=array(
-                'status'=>200,
-                'menssage'=>'Obra encontrada',
-                'Obra'=>$obra
-                );
-            }
-            else{
-                $response = array(
-                    'status'=>404,
-                    'menssage'=>'Recurso no encontrado'
-                );
 
-            }
-            return view('obras.show', ['obra' => $obra]);
+    public function show($id)
+    {
+        $obra = Obra::find($id);
+        if (is_object($obra)) {
+            $response = array(
+                'status' => 200,
+                'menssage' => 'Obra encontrada',
+                'Obra' => $obra
+            );
+        } else {
+            $response = array(
+                'status' => 404,
+                'menssage' => 'Recurso no encontrado'
+            );
+
         }
+        return view('obras.show', ['obra' => $obra]);
+    }
 
 
-        public function destroy($id){
-            if (isset($id)) {
-                var_dump($id);
-                $obra = Obra::find($id);
-                var_dump($obra);
-                if (!$obra) {
-                    $response = array(
-                        'status' => 404,
-                        'message' => 'Obra no encontrada'
-                    );
-                    return response()->json($response, $response['status']);
-                }
-                
-                $delete = Obra::where('id', $id)->delete();
-                if ($delete) {
-                    $response = array(
-                        'status' => 200,
-                        'message' => 'Obra eliminada',
-                    );
-                } else {
-                    $response = array(
-                        'status' => 400,
-                        'message' => 'No se pudo eliminar la obra, compruebe que exista'
-                    );
-                }
+    public function destroy($id)
+    {
+        if (isset($id)) {
+            var_dump($id);
+            $obra = Obra::find($id);
+            var_dump($obra);
+            if (!$obra) {
+                $response = array(
+                    'status' => 404,
+                    'message' => 'Obra no encontrada'
+                );
+                return response()->json($response, $response['status']);
+            }
+
+            $delete = Obra::where('id', $id)->delete();
+            if ($delete) {
+                $response = array(
+                    'status' => 200,
+                    'message' => 'Obra eliminada',
+                );
             } else {
                 $response = array(
-                    'status' => 406,
-                    'message' => 'Falta el identificador del recurso a eliminar'
+                    'status' => 400,
+                    'message' => 'No se pudo eliminar la obra, compruebe que exista'
                 );
             }
-        
-            return redirect()->route('obras')->with('success', 'Todo deleted successfully');
+        } else {
+            $response = array(
+                'status' => 406,
+                'message' => 'Falta el identificador del recurso a eliminar'
+            );
         }
-        
 
-        //patch
-    public function update(Request $request, $id) {
-    
+        return redirect()->route('obras')->with('success', 'Todo deleted successfully');
+    }
+
+
+    //patch
+    public function update(Request $request, $id)
+    {
+
         $obra = Obra::find($id);
         if (!$obra) {
             $response = [
@@ -145,10 +107,10 @@ class ObraController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-    
+
         $data_input = $request->input('data', null);
         $data_input = json_decode($data_input, true);
-    
+
         if (!$data_input) {
             $response = [
                 'status' => 400,
@@ -156,7 +118,7 @@ class ObraController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-    
+
         $tecnica = Obra::getTecnica();
 
         $rules = [
@@ -171,7 +133,7 @@ class ObraController extends Controller
         ];
 
         $validator = \validator($data_input, $rules);
-    
+
         if ($validator->fails()) {
             $response = [
                 'status' => 406,
@@ -180,17 +142,31 @@ class ObraController extends Controller
             ];
             return response()->json($response, $response['status']);
         }
-    
-        if(isset($data_input['tecnica'])) { $obra->tecnica = $data_input['tecnica']; }
-        if(isset($data_input['nombre'])) { $obra->nombre = $data_input['nombre']; }
-        if(isset($data_input['tamaño'])) { $obra->tamaño = $data_input['tamaño']; }
-        if(isset($data_input['precio'])) { $obra->precio = $data_input['precio']; }
-        if(isset($data_input['disponibilidad'])) { $obra->disponibilidad = $data_input['disponibilidad']; }
-        if(isset($data_input['categoria'])) { $obra->categoria = $data_input['categoria']; }
-        if(isset($data_input['imagen'])) { $obra->imagen = $data_input['imagen']; }
+
+        if (isset($data_input['tecnica'])) {
+            $obra->tecnica = $data_input['tecnica'];
+        }
+        if (isset($data_input['nombre'])) {
+            $obra->nombre = $data_input['nombre'];
+        }
+        if (isset($data_input['tamaño'])) {
+            $obra->tamaño = $data_input['tamaño'];
+        }
+        if (isset($data_input['precio'])) {
+            $obra->precio = $data_input['precio'];
+        }
+        if (isset($data_input['disponibilidad'])) {
+            $obra->disponibilidad = $data_input['disponibilidad'];
+        }
+        if (isset($data_input['categoria'])) {
+            $obra->categoria = $data_input['categoria'];
+        }
+        if (isset($data_input['imagen'])) {
+            $obra->imagen = $data_input['imagen'];
+        }
 
         $obra->save();
-    
+
         $response = [
             'status' => 201,
             'message' => 'Obra actualizada',

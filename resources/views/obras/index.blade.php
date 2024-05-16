@@ -18,11 +18,11 @@
         @endif
         <div class="flex">
             <label id="label" style="margin-bottom: 20px">
-                <input required="" placeholder="" value="{{$obra->idArtista}}" name="idArtista" type="text" class="input">
+                <input required="" placeholder="" name="idArtista" type="text" class="input">
                 <span>ID Artista</span>
             </label>
     
-            <select style="margin-bottom: 20px" aria-label="Large select example" value="{{$obra->tecnica}}" name="tecnica" class="comboBox rounded">
+            <select style="margin-bottom: 20px" aria-label="Large select example" name="tecnica" class="comboBox rounded">
                 <option selected disabled>Técnica</option>
                 <option value="Óleo sobre lienzo">Óleo sobre lienzo</option>
                 <option value="Acuarela">Acuarela</option>
@@ -48,28 +48,28 @@
         </div>  
                 
         <label style="margin-bottom: 20px">
-            <input required="" placeholder="" type="Text" name="nombre" class="input" value="{{ $obra->nombre }}">
+            <input required="" placeholder="" type="Text" name="nombre" class="input">
             <span>Nombre</span>
         </label> 
             
         <label style="margin-bottom: 20px">
-            <input required="" type="text" placeholder="" name="tamaño" class="input" value="{{ $obra->tamaño }}">
+            <input required="" type="text" placeholder="" name="tamaño" class="input">
             <span>Tamaño</span>
         </label>
         
             <div class="input-group mb-3">
                 <span class="input-group-text">$</span>
-                <input type="text" class="input form-control" name="precio" value="{{ $obra->precio }}" aria-label="Amount (to the nearest dollar)">
+                <input type="text" class="input form-control" name="precio" aria-label="Amount (to the nearest dollar)">
                 <span class="input-group-text">.00</span>
             </div>
 
             <label style="margin-bottom: 20px">
-                <input required="" type="text" placeholder="" name="categoria" value="{{ $obra->categoria }}" class="input">
+                <input required="" type="text" placeholder="" name="categoria" class="input">
                 <span>Categoria</span>
             </label>
 
             <div class="input-group mb-4" >
-                <input type="file" class="form-control" value="{{ $obra->imagen }}" name="imagen" id="inputGroupFile02">
+                <input type="file" class="form-control" name="imagen" id="inputGroupFile02">
             </div>
        
         <div style="width: 100%; padding-left: 30px;"><input type="submit" value="Agregar" class="fancy"></input></div>
